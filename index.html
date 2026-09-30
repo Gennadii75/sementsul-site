@@ -1,42 +1,211 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sementsul (SML) — BEP-20 на BNB Chain</title>
-<meta name="description" content="Sementsul (SML) — BEP-20 токен на BNB Chain. Контракт, токеномика, как купить.">
-<link rel="icon" href="sml-logo.svg" type="image/svg+xml">
+<title>SEMENTSUL (SML) — курс и калькулятор мешка</title>
+<meta name="description" content="SEMENTSUL (SML) on BNB Chain: live price, bag ruler, hype calibration. Drag the marker, set your hype.">
+<link rel="icon" href="sml-256.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0e1513;color:#f2efe4}
-.wrap{max-width:900px;margin:0 auto;padding:40px 20px}
-.card{background:#16211d;border:1px solid #2b3a34;border-radius:16px;padding:28px;margin-top:20px}
-h1{margin:10px 0;font-size:42px}.tag{color:#e9d27a;letter-spacing:2px;font-size:12px}
-a{color:#e9d27a}.btn{display:inline-block;background:#e9d27a;color:#111;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700;margin-right:10px;margin-top:10px}
-code{background:#00000055;padding:2px 6px;border-radius:6px;word-break:break-all}
-.logo{width:96px;height:96px}
+:root{--ink:#171712;--acid:#e9ff3f;--paper:#f3f0e7;--orange:#ff5a36;--line:#c9c5b8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'Space Mono',monospace;margin:0}
+button,input{font:inherit}button{color:inherit}
+main{background-image:linear-gradient(#17171209 1px,#0000 1px),linear-gradient(90deg,#17171209 1px,#0000 1px);background-size:32px 32px;min-height:100vh;overflow:hidden}
+.nav{border-bottom:2px solid var(--ink);background:var(--paper);justify-content:space-between;align-items:center;height:78px;padding:0 clamp(20px,4vw,64px);display:flex}
+.brand{font-family:'Archivo Black',sans-serif;letter-spacing:-1px;color:var(--ink);font-size:clamp(20px,2.4vw,31px);text-decoration:none}
+.brand span{color:var(--orange);font:12px 'Space Mono',monospace;vertical-align:top;margin-left:2px}
+.nav-right{align-items:center;gap:24px;display:flex}
+.status{letter-spacing:1px;align-items:center;gap:8px;font-size:10px;font-weight:700;display:flex}
+.status i{background:#33bd66;border-radius:50%;width:9px;height:9px;box-shadow:0 0 0 4px #33bd6626}
+.status.dead i{background:var(--orange);box-shadow:0 0 0 4px #ff5a3626}
+.unit-toggle{border:2px solid var(--ink);background:#fff;border-radius:99px;padding:3px;display:flex}
+.unit-toggle button{cursor:pointer;background:0 0;border:0;border-radius:99px;width:52px;height:31px;font-size:11px;font-weight:700}
+.unit-toggle button.active{background:var(--ink);color:var(--acid)}
+.hero{text-align:center;padding:clamp(62px,9vw,126px) clamp(20px,6vw,92px) 45px}
+.eyebrow{background:var(--acid);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);letter-spacing:1.5px;padding:7px 12px;font-size:10px;font-weight:700;display:inline-block;transform:rotate(-1deg)}
+h1{max-width:1100px;font-family:'Archivo Black',sans-serif;letter-spacing:-5px;margin:27px auto 18px;font-size:clamp(52px,8.6vw,132px);line-height:.85}
+h1 em{color:var(--orange);-webkit-text-stroke:2px var(--ink);text-shadow:6px 6px 0 var(--ink);font-style:normal;display:block;transform:rotate(-1deg)}
+.lede{margin:28px auto 0;font-size:clamp(12px,1.3vw,16px);font-weight:700}
+.machine{border:3px solid var(--ink);box-shadow:10px 10px 0 var(--ink);background:#fff;margin:25px clamp(12px,3vw,48px) 100px}
+.machine-top{border-bottom:3px solid var(--ink);background:var(--ink);color:#fff;justify-content:space-between;align-items:center;min-height:140px;padding:22px clamp(18px,3vw,42px);display:flex;gap:16px;flex-wrap:wrap}
+.micro-label{color:#aaa99f;letter-spacing:1.6px;margin-bottom:4px;font-size:9px;font-weight:700;display:block}
+.reading{font-family:'Archivo Black',sans-serif;color:var(--acid);letter-spacing:-3px;font-size:clamp(44px,6vw,84px);line-height:.9}
+.reading small{font:700 16px 'Space Mono',monospace;letter-spacing:0;text-transform:uppercase;margin-left:8px}
+.bagline{color:#fff;font-size:11px;font-weight:700;margin-top:8px}
+.verdict{border:1px solid #5f5f57;min-width:220px;padding:14px 18px}
+.verdict span{color:#99988f;letter-spacing:1.4px;margin-bottom:6px;font-size:8px;display:block}
+.verdict strong{color:var(--orange);font-size:12px}
+.launch-bay{border-bottom:3px solid var(--ink);background:#dcd8cb;grid-template-columns:118px 1fr;height:290px;display:grid}
+.base-dock{border-right:3px solid var(--ink);background:var(--acid);text-align:center;flex-direction:column;justify-content:center;align-items:center;gap:12px;font-size:10px;font-weight:700;display:flex}
+.base-dock b{font-size:30px}
+.ruler{cursor:ew-resize;touch-action:none;-webkit-user-select:none;user-select:none;background:linear-gradient(#f7f4eb 0 48%,#e8e4d7 48%);position:relative;overflow:hidden}
+.tick-layer{background-image:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px calc(var(--tick-spacing)/10));opacity:.85;position:absolute;inset:0;-webkit-mask-image:linear-gradient(#000 0 31px,#0000 31px 100%);mask-image:linear-gradient(#000 0 31px,#0000 31px 100%)}
+.number-row{height:25px;font-size:10px;font-weight:700;position:absolute;inset:38px 0 auto}
+.number-row span{position:absolute;transform:translate(-50%);white-space:nowrap}
+.placement-zone{background:#ffffff59;border-top:3px dashed #17171259;border-bottom:3px dashed #17171259;align-items:center;height:80px;padding-left:25px;display:flex;position:absolute;top:116px;left:0;right:0}
+.placement-zone span{color:#17171261;letter-spacing:2px;font-size:10px;font-weight:700}
+.tip-marker{border:0;border-left:4px solid var(--orange);cursor:ew-resize;z-index:3;background:0 0;outline:none;width:4px;padding:0;position:absolute;top:18px;bottom:14px;transform:translate(-50%)}
+.tip-marker span{background:var(--orange);color:#fff;padding:5px 8px;font-size:9px;position:absolute;top:-1px;left:7px;white-space:nowrap}
+.tip-marker i{border:3px solid var(--ink);background:var(--orange);color:#fff;width:38px;height:38px;box-shadow:3px 3px 0 var(--ink);place-items:center;font-style:normal;display:grid;position:absolute;bottom:-1px;left:-20px}
+.controls{background:#fff;padding:30px clamp(18px,4vw,58px) 36px}
+.control-heading{justify-content:space-between;align-items:end;margin-bottom:22px;display:flex;gap:12px;flex-wrap:wrap}
+.control-heading strong{font-family:'Archivo Black',sans-serif;font-size:clamp(18px,2vw,26px)}
+.swagger{background:var(--orange);color:#fff;padding:7px 10px;font-size:10px;font-weight:700;transform:rotate(1deg)}
+input[type=range]{-webkit-appearance:none;appearance:none;border:2px solid var(--ink);background:linear-gradient(90deg,var(--acid),var(--orange));width:100%;height:9px;box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;border:3px solid var(--ink);width:28px;height:36px;box-shadow:3px 3px 0 var(--ink);background:#fff}
+input[type=range]::-moz-range-thumb{border:3px solid var(--ink);width:25px;height:33px;box-shadow:3px 3px 0 var(--ink);background:#fff;border-radius:0}
+.range-labels{justify-content:space-between;margin-top:15px;font-size:8px;font-weight:700;display:flex}
+.stats{border-top:3px solid var(--ink);background:var(--paper);padding:26px clamp(18px,4vw,58px);display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat b{font-family:'Archivo Black',sans-serif;font-size:20px;display:block}
+.stat span{font-size:9px;letter-spacing:1.4px;color:#77776e}
+.stat a{color:var(--ink)}
+.how-it-works{border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);background:var(--acid);padding:85px clamp(20px,5vw,80px) 105px}
+.section-title{text-align:center}
+.section-title>span{background:#fff;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);letter-spacing:1.5px;padding:7px 12px;font-size:10px;font-weight:700;display:inline-block;transform:rotate(-1deg)}
+h2{font-family:'Archivo Black',sans-serif;letter-spacing:-3px;margin:24px 0 45px;font-size:clamp(38px,6vw,78px);text-align:center}
+.steps{grid-template-columns:repeat(3,1fr);gap:20px;max-width:1200px;margin:auto;display:grid}
+.steps article{border:3px solid var(--ink);background:var(--paper);min-height:270px;box-shadow:7px 7px 0 var(--ink);padding:33px 28px;position:relative}
+.steps b{font-family:'Archivo Black',sans-serif;color:var(--orange);font-size:46px}
+.steps h3{font-family:'Archivo Black',sans-serif;margin:22px 0 15px;font-size:23px}
+.steps p{font-size:11px;font-weight:700;line-height:1.7}
+.fine-print{border:2px solid var(--ink);max-width:920px;box-shadow:5px 5px 0 var(--ink);background:#fff;grid-template-columns:240px 1fr;gap:25px;margin:80px auto;padding:24px 28px;font-size:10px;line-height:1.7;display:grid}
+.fine-print strong{color:var(--orange)}
+.fine-print p{margin:0}
+footer{background:var(--ink);color:#fff;grid-template-columns:1fr auto;align-items:center;gap:10px;min-height:190px;padding:45px clamp(20px,5vw,70px);display:grid}
+.footer-brand{color:var(--acid);font-family:'Archivo Black',sans-serif;font-size:clamp(28px,4vw,52px)}
+footer p{color:#aaa99f;grid-row:2;margin:0;font-size:10px}
+footer>span{color:#77776e;grid-area:1/2/3;font-size:9px}
+@media (max-width:720px){.status{display:none}.machine{box-shadow:6px 6px 0 var(--ink);margin-bottom:70px}.verdict{min-width:0}.launch-bay{grid-template-columns:66px 1fr;height:260px}.steps{grid-template-columns:1fr}.fine-print{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<img class="logo" src="sml-logo.svg" alt="SML logo">
-<div class="tag">BEP-20 · BNB CHAIN</div>
-<h1>Sementsul (SML)</h1>
-<p>1 000 000 000 SML · 18 decimals. Официальный контракт ниже.</p>
-<div class="card">
-<div>Контракт:</div>
-<code>0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3</code>
-<div style="margin-top:12px">
-<a class="btn" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">BscScan</a>
-<a class="btn" href="https://pancakeswap.finance/swap?outputCurrency=0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Купить на PancakeSwap</a>
+<main>
+<nav class="nav" aria-label="Main navigation">
+<a class="brand" href="#top">SEMENTSUL<span>SML</span></a>
+<div class="nav-right"><span class="status" id="netStatus"><i></i> CHECKING…</span>
+<div class="unit-toggle" aria-label="Currency unit"><button id="uUsd" class="active">USD</button><button id="uBnb">BNB</button></div></div>
+</nav>
+<section class="hero" id="top">
+<div class="eyebrow">SEMENTSUL · BEP-20 · BNB CHAIN</div>
+<h1>HOW BIG IS YOUR <em>MEM BAG?</em></h1>
+<p class="lede">Drag the bag marker. Set your hype. Track your MEM in real time.</p>
+</section>
+<section class="machine" aria-label="Interactive bag ruler">
+<div class="machine-top">
+<div><span class="micro-label">LIVE READING</span>
+<div class="reading" aria-live="polite"><span id="readVal">—</span><small id="readUnit">usd</small></div>
+<div class="bagline" id="bagLine">0 SML · 0.00% of supply</div></div>
+<div class="verdict"><span>OFFICIAL VERDICT</span><strong id="verdict">LOADING…</strong></div>
+</div>
+<div class="launch-bay">
+<div class="base-dock"><span>SML<br>GOES<br>HERE</span><b>Ⓜ</b></div>
+<div class="ruler" id="ruler" style="--tick-spacing:10%">
+<div class="tick-layer"></div>
+<div class="number-row" id="numRow" aria-hidden="true"></div>
+<div class="placement-zone"><span>PLACE YOUR SML ALONG THIS LINE</span></div>
+<button class="tip-marker" id="marker" aria-label="Bag marker" style="left:5%"><span id="markLabel">BAG</span><i>◆</i></button>
 </div>
 </div>
-<div class="card">
-<h3>Как добавить в MetaMask</h3>
-<p>Импорт токенов → вставь адрес контракта → символ SML, 18 decimals.</p>
-<h3>Логотип для листингов</h3>
-<p>SVG 32x32: <a href="sml-logo.svg">sml-logo.svg</a></p>
+<div class="controls">
+<div class="control-heading">
+<div><span class="micro-label">HYPE CALIBRATION</span><strong id="hypeName">STONE-COLD SOBER</strong></div>
+<div class="swagger" id="swagger">×1 HYPE</div>
 </div>
-<div class="card"><h3>Контакты проекта</h3><p>Official email укажи здесь после публикации, он же пойдет в форму BscScan Update Token Info.</p></div>
+<input id="hype" min="0" max="100" step="1" value="30" type="range" aria-label="Hype calibration: multiply the live price by your belief">
+<div class="range-labels"><span>BEAR MARKET</span><span>SPOT PRICE</span><span>LEGENDARY</span></div>
 </div>
+<div class="stats">
+<div class="stat"><span>MEM PRICE</span><b id="sPrice">—</b></div>
+<div class="stat"><span>BNB PRICE</span><b id="sBnb">—</b></div>
+<div class="stat"><span>TOTAL SUPPLY</span><b id="sSupply">1,000,000,000</b></div>
+<div class="stat"><span>MARKET CAP</span><b id="sMcap">—</b></div>
+<div class="stat"><span>DATA UPDATED</span><b id="sUpd">—</b></div>
+<div class="stat"><span>CONTRACT</span><b><a href="https://bscscan.com/address/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">BscScan ↗</a></b></div>
+</div>
+</section>
+<section class="how-it-works">
+<div class="section-title"><span>NO PHD REQUIRED</span></div>
+<h2>THREE STEPS TO GLORY.</h2>
+<div class="steps">
+<article><b>01</b><h3>CHECK THE TAPE</h3><p>Live MEM price, BNB price and total supply are pulled from the chain by GitHub Actions every 5 minutes. No liquidity yet — no price. Add some on PancakeSwap.</p></article>
+<article><b>02</b><h3>DRAG THE BAG</h3><p>Drag the orange marker along the ruler to set how much MEM you hold — from dust to the full 1,000,000,000 supply. The verdict updates with your rank.</p></article>
+<article><b>03</b><h3>PUMP REALITY</h3><p>Not loving the number? Slide Hype Calibration to multiply the spot price by your belief. Fully unscientific. Fully motivating.</p></article>
+</div>
+</section>
+<aside class="fine-print"><strong>⚠ SERIOUSLY UNSERIOUS FINANCE</strong><p>Prices refresh every 5 minutes and can be stale. Hype multiplier is fantasy, not financial advice. This ruler measures dreams, not medical decisions, world records, or group-chat arguments. SEMENTSUL (SML) is an experimental BEP-20 token on BNB Chain.</p></aside>
+<footer><div class="footer-brand">SML-O-METER™</div><p>Built for big bags and suspiciously volatile rulers. SEMENTSUL (SML) · BNB Chain · <a href="https://bscscan.com/address/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank" style="color:#e9ff3f">0xF79C…18Ef3</a></p><span>18+ · DYOR</span></footer>
+</main>
+<script>
+const TOTAL = 1000000000;
+let live = {priceUsd:null, priceNative:null, bnbUsd:null, updatedAt:null};
+let unit = 'USD', frac = 0.05, hype = 1;
+const $ = id => document.getElementById(id);
+const ruler = $('ruler'), marker = $('marker');
+
+function fmt(n, d=2){ if(n==null||isNaN(n)) return '—';
+  if(Math.abs(n)>=1e9) return (n/1e9).toFixed(2)+'B';
+  if(Math.abs(n)>=1e6) return (n/1e6).toFixed(2)+'M';
+  if(Math.abs(n)>=1e3) return (n/1e3).toFixed(2)+'K';
+  return n.toFixed(d); }
+function fmtInt(n){ return Math.floor(n).toLocaleString('en-US'); }
+function hypeFromSlider(v){ return Math.pow(10, (v-30)/25); } // 30→×1, 0→×0.06, 100→×630
+function hypeName(m){ if(m<0.5) return 'BEAR MARKET BLUES'; if(m<0.95) return 'CAUTIOUSLY HONEST';
+  if(m<=1.05) return 'SPOT PRICE PURIST'; if(m<5) return 'CONFIDENTLY OPTIMISTIC';
+  if(m<50) return 'FULL SEND'; return 'LEGENDARY DELUSION'; }
+function verdictFor(share){ if(share<=0) return 'EMPTY POCKETS'; if(share<0.0001) return 'DUST BUNNY';
+  if(share<0.001) return 'SHRIMP'; if(share<0.01) return 'FISH'; if(share<0.05) return 'DOLPHIN';
+  if(share<0.2) return 'SHARK'; if(share<0.5) return 'WHALE'; return 'SUPPLY LEGEND'; }
+
+function drawTicks(){
+  const row = $('numRow'); row.innerHTML = '';
+  for(let i=0;i<=10;i++){ const s=document.createElement('span');
+    s.style.left = (i*10)+'%'; s.textContent = i===0?'0':(i+'M'); row.appendChild(s); }
+  ruler.style.setProperty('--tick-spacing', (ruler.clientWidth/10)+'px');
+}
+function render(){
+  const bag = frac*TOTAL, share = frac;
+  let price = unit==='USD' ? live.priceUsd : live.priceNative;
+  let val = (price!=null) ? bag*parseFloat(price)*hype : null;
+  $('readVal').textContent = val==null ? '—' : (unit==='USD'?'$':'')+fmt(val);
+  $('readUnit').textContent = unit.toLowerCase()+(hype!==1?' · ×'+(hype>=100?Math.round(hype):hype.toFixed(hype<1?2:1)):'');
+  $('bagLine').textContent = fmtInt(bag)+' MEM · '+(share*100).toFixed(share<0.001?3:2)+'% of supply';
+  $('verdict').textContent = live.priceUsd==null && live.priceNative==null ? verdictFor(share)+' (NO PRICE YET)' : verdictFor(share);
+  $('markLabel').textContent = fmt(bag,0)+' MEM';
+  marker.setAttribute('aria-label','Bag marker, '+fmtInt(bag)+' MEM');
+  const hn = hypeName(hype);
+  $('hypeName').textContent = hn;
+  $('swagger').textContent = '×'+(hype>=100?Math.round(hype):hype.toFixed(hype<1?2:1))+' HYPE';
+}
+function setFrac(f){ frac = Math.min(1, Math.max(0, f));
+  marker.style.left = (frac*100)+'%'; render(); }
+let drag=false;
+function x2f(e){ const r=ruler.getBoundingClientRect(); return (e.clientX-r.left)/r.width; }
+ruler.addEventListener('pointerdown', e=>{ drag=true; ruler.setPointerCapture(e.pointerId); setFrac(x2f(e)); });
+ruler.addEventListener('pointermove', e=>{ if(drag) setFrac(x2f(e)); });
+ruler.addEventListener('pointerup', ()=>drag=false);
+marker.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft'){setFrac(frac-0.01);e.preventDefault();}
+  if(e.key==='ArrowRight'){setFrac(frac+0.01);e.preventDefault();} });
+$('hype').addEventListener('input', e=>{ hype = hypeFromSlider(parseFloat(e.target.value)); render(); });
+$('uUsd').addEventListener('click', ()=>{ unit='USD'; $('uUsd').classList.add('active'); $('uBnb').classList.remove('active'); render(); });
+$('uBnb').addEventListener('click', ()=>{ unit='BNB'; $('uBnb').classList.add('active'); $('uUsd').classList.remove('active'); render(); });
+window.addEventListener('resize', drawTicks);
+fetch('data/price.json').then(r=>r.json()).then(d=>{
+  live.priceUsd=d.priceUsd; live.priceNative=d.priceNative; live.bnbUsd=d.bnbUsd; live.updatedAt=d.updatedAt;
+  const has = d.priceUsd!=null||d.priceNative!=null;
+  const st=$('netStatus');
+  st.innerHTML = has?'<i></i> LIVE':'<i></i> NO LIQUIDITY'; if(!has) st.classList.add('dead');
+  $('sPrice').textContent = d.priceUsd?('$'+d.priceUsd):'—';
+  $('sBnb').textContent = d.bnbUsd?('$'+d.bnbUsd):'—';
+  if(d.totalSupply) $('sSupply').textContent = Number(d.totalSupply).toLocaleString('en-US');
+  $('sMcap').textContent = d.priceUsd?('$'+fmt(parseFloat(d.priceUsd)*TOTAL)):'—';
+  $('sUpd').textContent = d.updatedAt?(new Date(d.updatedAt).toLocaleString()):'—';
+  render();
+}).catch(()=>{ $('verdict').textContent='OFFLINE'; render(); });
+hype = hypeFromSlider(30); drawTicks(); setFrac(0.05);
+</script>
 </body>
 </html>
+
