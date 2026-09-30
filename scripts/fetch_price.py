@@ -11,6 +11,8 @@ def main():
     price_usd = None
     price_native = None
     pair_url = None
+    liquidity_usd = None
+    change_24h = None
     try:
         dex = get(f"https://api.dexscreener.com/latest/dex/tokens/{CONTRACT}")
         pairs = dex.get("pairs") or []
@@ -20,6 +22,8 @@ def main():
             price_usd = p0.get("priceUsd")
             price_native = p0.get("priceNative")
             pair_url = p0.get("url")
+            liquidity_usd = (p0.get("liquidity") or {}).get("usd")
+            change_24h = (p0.get("priceChange") or {}).get("h24")
     except Exception as e:
         print("dexscreener error:", e)
 
@@ -30,7 +34,7 @@ def main():
     except Exception as e:
         print("coingecko error:", e)
 
-    total_supply = "10000000"
+    total_supply = "1000000000"
     try:
         payload = json.dumps({
             "jsonrpc": "2.0", "id": 1, "method": "eth_call",
@@ -47,6 +51,8 @@ def main():
     data = {
         "priceUsd": price_usd,
         "priceNative": price_native,
+        "liquidityUsd": liquidity_usd,
+        "change24h": change_24h,
         "bnbUsd": bnb_usd,
         "totalSupply": total_supply,
         "pairUrl": pair_url,
