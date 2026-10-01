@@ -4,7 +4,8 @@ CONTRACT = "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
 OUT = "data/price.json"
 
 def get(url, timeout=20):
-    with urllib.request.urlopen(url, timeout=timeout) as r:
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (SML price updater)"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
 def main():
