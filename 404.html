@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Sementsul</title>
+    <meta name="robots" content="noindex, follow">
+    <link rel="icon" href="sml-256.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0A1C2E;
+            --gold: #D4AF37;
+            --gold-light: #F4D03F;
+            --text-light: #E0E0E0;
+            --font-heading: 'Cinzel', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--navy);
+            background-image: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        img { width: 140px; border-radius: 50%; filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4)); margin-bottom: 30px; }
+        h1 { font-family: var(--font-heading); color: var(--gold); font-size: 5rem; font-weight: 900; letter-spacing: 4px; }
+        p { color: #B0B0B0; margin: 10px 0 30px; letter-spacing: 1px; }
+        .row { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .btn {
+            display: inline-block; padding: 15px 35px;
+            font-family: var(--font-heading); font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; border: 2px solid var(--gold);
+            background: transparent; color: var(--gold); text-decoration: none;
+            transition: all 0.4s ease;
+        }
+        .btn-primary { background: var(--gold); color: var(--navy); }
+        .btn-primary:hover { background: var(--gold-light); box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+        .lang-switch { display: flex; border: 1px solid var(--gold); border-radius: 6px; overflow: hidden; margin-bottom: 25px; }
+        .lang-switch button {
+            background: transparent; border: 0; color: var(--gold);
+            font-family: var(--font-body); font-size: 0.75rem; font-weight: 600;
+            padding: 8px 12px; cursor: pointer;
+        }
+        .lang-switch button.active { background: var(--gold); color: var(--navy); }
+    </style>
+</head>
+<body>
+    <div class="lang-switch" role="group" aria-label="Language">
+        <button data-lang="en">EN</button>
+        <button data-lang="zh">CN</button>
+        <button data-lang="ru">RU</button>
+    </div>
+    <img src="sml-256.png" alt="Sementsul">
+    <h1>404</h1>
+    <p data-i18n="msg">Такая страница не найдена в имперском архиве.</p>
+    <div class="row">
+        <a class="btn btn-primary" data-i18n="home" href="/">На главную</a>
+        <a class="btn" data-i18n="contract_btn" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Контракт</a>
+    </div>
+    <script>
+        var T = {
+            en: { msg: 'This page is not found in the imperial archive.', home: 'Home', contract_btn: 'Contract' },
+            ru: { msg: 'Такая страница не найдена в имперском архиве.', home: 'На главную', contract_btn: 'Контракт' },
+            zh: { msg: '帝国档案中没有此页面。', home: '返回首页', contract_btn: '合约' }
+        };
+        function getCookie(n) {
+            var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)'));
+            return m ? decodeURIComponent(m[1]) : null;
+        }
+        function setCookie(n, v) {
+            document.cookie = n + '=' + encodeURIComponent(v) + '; max-age=31536000; path=/; SameSite=Lax';
+        }
+        var L = getCookie('sml_lang');
+        if (!L || !T[L]) {
+            var b = (navigator.language || 'en').toLowerCase();
+            L = b.indexOf('ru') === 0 ? 'ru' : (b.indexOf('zh') === 0 ? 'zh' : 'en');
+        }
+        function apply(l) {
+            L = T[l] ? l : 'en';
+            setCookie('sml_lang', L);
+            document.documentElement.lang = L === 'zh' ? 'zh-CN' : L;
+            document.querySelectorAll('[data-i18n]').forEach(function (el) {
+                el.textContent = T[L][el.getAttribute('data-i18n')];
+            });
+            document.querySelectorAll('.lang-switch button').forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === L);
+            });
+        }
+        document.querySelectorAll('.lang-switch button').forEach(function (btn) {
+            btn.addEventListener('click', function () { apply(btn.getAttribute('data-lang')); });
+        });
+        apply(L);
+    </script>
+</body>
+</html>
