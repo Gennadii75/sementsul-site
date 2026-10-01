@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: "3.11"
       - run: python scripts/fetch_price.py
+        env:
+          BSCSCAN_API_KEY: ${{ secrets.BSCSCAN_API_KEY }}
       - run: |
           if git diff --quiet; then echo "no changes"; exit 0; fi
           git config user.name "github-actions"

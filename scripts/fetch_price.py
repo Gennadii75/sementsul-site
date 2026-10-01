@@ -1,4 +1,4 @@
-﻿import json, urllib.request, datetime
+﻿import json, os, urllib.request, datetime
 
 CONTRACT = "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
 OUT = "data/price.json"
@@ -34,6 +34,18 @@ def main():
     except Exception as e:
         print("coingecko error:", e)
 
+    holders = None
+    api_key = os.environ.get("BSCSCAN_API_KEY")
+    if api_key:
+        try:
+            bsc = get(f"https://api.bscscan.com/api?module=token&action=tokenholderlist&contractaddress={CONTRACT}&page=1&offset=10000&apikey={api_key}")
+            if str(bsc.get("status")) == "1":
+                holders = len(bsc.get("result") or [])
+            else:
+                print("bscscan holders:", bsc.get("message"), bsc.get("result"))
+        except Exception as e:
+            print("bscscan error:", e)
+
     total_supply = "1000000000"
     try:
         payload = json.dumps({
@@ -54,6 +66,7 @@ def main():
         "liquidityUsd": liquidity_usd,
         "change24h": change_24h,
         "bnbUsd": bnb_usd,
+        "holders": holders,
         "totalSupply": total_supply,
         "pairUrl": pair_url,
         "updatedAt": datetime.datetime.utcnow().isoformat() + "Z",

@@ -662,6 +662,9 @@
                 if (d.pairUrl) ls.innerHTML = '<a href="' + d.pairUrl + '" target="_blank">' + I18N[LANG].view_pool + '</a>';
                 else ls.textContent = I18N[LANG].dex;
             }
+            if (d.holders != null) {
+                document.getElementById('holders').textContent = Number(d.holders).toLocaleString('en-US');
+            }
         }).catch(function () {});
     </script>
 
