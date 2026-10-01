@@ -41,30 +41,49 @@ def main():
     holders = None
     api_key = os.environ.get("BSCSCAN_API_KEY")
     moralis_key = os.environ.get("MORALIS_API_KEY")
-    if moralis_key:
-        # Moralis Token Owners (free-план): пагинация курсором, считаем владельцев.
-        try:
-            import urllib.parse
-            total = 0
-            cursor = ""
-            for _ in range(10):
-                url = f"https://deep-index.moralis.io/api/v2.2/erc20/{CONTRACT}/owners?chain=bsc&order=DESC&limit=100" + (f"&cursor={urllib.parse.quote(cursor)}" if cursor else "")
-                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (SML price updater)", "X-API-Key": moralis_key})
-                with urllib.request.urlopen(req, timeout=20) as r:
-                    owners = json.loads(r.read().decode())
-                result = owners.get("result") or []
-                total += len(result)
-                cursor = owners.get("cursor") or ""
-                if not cursor or not result:
-                    break
-            else:
-                print("moralis owners: more than 1000 holders, count capped")
-            holders = total or None
-        except Exception as e:
-            print("moralis error:", e)
-    elif api_key:
-        # Бесплатный способ: все переводы токена (tokentx входит в free-план),
-        # считаем адреса с положительным балансом. tokenholderlist — платный.
+    # Способ 1 (бесплатно, без ключа): все Transfer-логи с публичного RPC,
+    # считаем адреса с положительным балансом.
+    try:
+        transfer_topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        payload = json.dumps({"jsonrpc": "2.0", "id": 2, "method": "eth_blockNumber", "params": []}).encode()
+        req = urllib.request.Request("https://bsc-dataseed.binance.org", data=payload, headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (SML price updater)"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            latest = int(json.loads(r.read().decode()).get("result", "0x0"), 16)
+        deploy_block = 124978800
+        balances = {}
+        step = 500000
+        start = deploy_block
+        while start <= latest:
+            end = min(start + step - 1, latest)
+            payload = json.dumps({
+                "jsonrpc": "2.0", "id": 3, "method": "eth_getLogs",
+                "params": [{"address": CONTRACT, "topics": [transfer_topic],
+                            "fromBlock": hex(start), "toBlock": hex(end)}]
+            }).encode()
+            req = urllib.request.Request("https://bsc-dataseed.binance.org", data=payload, headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (SML price updater)"})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                logs = json.loads(r.read().decode()).get("result") or []
+            for lg in logs:
+                topics = lg.get("topics") or []
+                if len(topics) < 3:
+                    continue
+                f = "0x" + topics[1][-40:]
+                to = "0x" + topics[2][-40:]
+                try:
+                    val = int(lg.get("data", "0x0"), 16)
+                except (TypeError, ValueError):
+                    continue
+                zero = "0x0000000000000000000000000000000000000000"
+                if f.lower() != zero:
+                    balances[f.lower()] = balances.get(f.lower(), 0) - val
+                if to.lower() != zero:
+                    balances[to.lower()] = balances.get(to.lower(), 0) + val
+            start = end + 1
+        holders = sum(1 for v in balances.values() if v > 0) or None
+    except Exception as e:
+        print("rpc holders error:", e)
+    if holders is None and api_key:
+        # Запасной вариант (для BSC тоже может требовать платный план).
         try:
             balances = {}
             page = 1
