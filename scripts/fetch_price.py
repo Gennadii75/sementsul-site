@@ -28,8 +28,6 @@ def main():
                 pair_url = f"https://www.geckoterminal.com/bsc/pools/{pool_addr}"
     except Exception as e:
         print("geckoterminal error:", e)
-    except Exception as e:
-        print("dexscreener error:", e)
 
     bnb_usd = None
     try:
