@@ -140,6 +140,16 @@ def main():
         "updatedAt": datetime.datetime.utcnow().isoformat() + "Z",
         "contract": CONTRACT,
     }
+    # Если свежих данных нет — сохраняем последнее известное число холдеров.
+    if data["holders"] is None:
+        try:
+            with open(OUT) as f:
+                old = json.load(f)
+            if old.get("holders") is not None:
+                data["holders"] = old["holders"]
+                print("holders kept from previous:", data["holders"])
+        except Exception as e:
+            print("holders keep error:", e)
     with open(OUT, "w") as f:
         json.dump(data, f, indent=2)
     print("wrote", OUT, data)
