@@ -41,12 +41,37 @@ def main():
     holders = None
     api_key = os.environ.get("BSCSCAN_API_KEY")
     if api_key:
+        # Бесплатный способ: все переводы токена (tokentx входит в free-план),
+        # считаем адреса с положительным балансом. tokenholderlist — платный.
         try:
-            bsc = get(f"https://api.etherscan.io/v2/api?chainid=56&module=token&action=tokenholderlist&contractaddress={CONTRACT}&page=1&offset=10000&apikey={api_key}")
-            if str(bsc.get("status")) == "1":
-                holders = len(bsc.get("result") or [])
+            balances = {}
+            page = 1
+            while page <= 5:
+                tx = get(f"https://api.etherscan.io/v2/api?chainid=56&module=account&action=tokentx&contractaddress={CONTRACT}&page={page}&offset=10000&startblock=0&endblock=99999999&sort=asc&apikey={api_key}")
+                if str(tx.get("status")) != "1":
+                    print("bscscan tx:", tx.get("message"), str(tx.get("result"))[:200])
+                    break
+                result = tx.get("result") or []
+                if not result:
+                    break
+                for t in result:
+                    try:
+                        val = int(t.get("value", "0"))
+                    except (TypeError, ValueError):
+                        continue
+                    f = (t.get("from") or "").lower()
+                    to = (t.get("to") or "").lower()
+                    if f and f != "0x0000000000000000000000000000000000000000":
+                        balances[f] = balances.get(f, 0) - val
+                    if to and to != "0x0000000000000000000000000000000000000000":
+                        balances[to] = balances.get(to, 0) + val
+                if len(result) < 10000:
+                    break
+                page += 1
             else:
-                print("bscscan holders:", bsc.get("message"), bsc.get("result"))
+                print("bscscan tx: too many transfers, holder count capped")
+            if balances:
+                holders = sum(1 for v in balances.values() if v > 0)
         except Exception as e:
             print("bscscan error:", e)
 

@@ -12,7 +12,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Ping site
         run: |
           curl -s -o /dev/null -w "pages: %{http_code}\n" https://Gennadii75.github.io/sementsul-site/ || true
