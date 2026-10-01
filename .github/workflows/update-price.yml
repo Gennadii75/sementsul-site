@@ -20,6 +20,7 @@ jobs:
         env:
           BSCSCAN_API_KEY: ${{ secrets.BSCSCAN_API_KEY }}
           MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
       - run: |
           git pull --rebase origin main || true
           if git diff --quiet; then echo "no changes"; exit 0; fi

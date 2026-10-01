@@ -39,29 +39,56 @@ def main():
     holders = None
     api_key = os.environ.get("BSCSCAN_API_KEY")
     moralis_key = os.environ.get("MORALIS_API_KEY")
-    # Способ 1 (бесплатно, без ключа): все Transfer-логи с публичного RPC,
-    # считаем адреса с положительным балансом.
+    # Способ 1 (бесплатно): все Transfer-логи с RPC, считаем адреса с балансом > 0.
+    # Публичные endpoints режут getLogs, поэтому крутим список; Alchemy free-ключ
+    # (секрет ALCHEMY_API_KEY) дает полный доступ к логам BSC.
+    def rpc_call(url, method, params, timeout=30):
+        payload = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
+        req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (SML price updater)"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            res = json.loads(r.read().decode())
+        if res.get("error"):
+            raise RuntimeError(str(res["error"].get("message")))
+        return res.get("result")
     try:
         transfer_topic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
-        payload = json.dumps({"jsonrpc": "2.0", "id": 2, "method": "eth_blockNumber", "params": []}).encode()
-        req = urllib.request.Request("https://bsc-dataseed.binance.org", data=payload, headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (SML price updater)"})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            latest = int(json.loads(r.read().decode()).get("result", "0x0"), 16)
+        rpcs = []
+        alchemy_key = os.environ.get("ALCHEMY_API_KEY")
+        if alchemy_key:
+            rpcs.append(f"https://bnb-mainnet.g.alchemy.com/v2/{alchemy_key}")
+        rpcs += ["https://bsc-dataseed.binance.org",
+                 "https://bsc-dataseed1.binance.org",
+                 "https://bsc-dataseed1.defibit.io",
+                 "https://bsc-dataseed1.ninicoin.io"]
+        latest = None
+        last_err = None
+        for ep in rpcs:
+            try:
+                latest = int(rpc_call(ep, "eth_blockNumber", []), 16)
+                rpc_url = ep
+                break
+            except Exception as e:
+                last_err = e
+        if latest is None:
+            raise RuntimeError(f"no RPC available: {last_err}")
         deploy_block = 124978800
         balances = {}
         step = 500000
         start = deploy_block
         while start <= latest:
             end = min(start + step - 1, latest)
-            payload = json.dumps({
-                "jsonrpc": "2.0", "id": 3, "method": "eth_getLogs",
-                "params": [{"address": CONTRACT, "topics": [transfer_topic],
-                            "fromBlock": hex(start), "toBlock": hex(end)}]
-            }).encode()
-            req = urllib.request.Request("https://bsc-dataseed.binance.org", data=payload, headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (SML price updater)"})
-            with urllib.request.urlopen(req, timeout=30) as r:
-                logs = json.loads(r.read().decode()).get("result") or []
-            for lg in logs:
+            logs = None
+            last_err = None
+            for ep in rpcs:
+                try:
+                    logs = rpc_call(ep, "eth_getLogs", [{"address": CONTRACT, "topics": [transfer_topic],
+                                                        "fromBlock": hex(start), "toBlock": hex(end)}])
+                    break
+                except Exception as e:
+                    last_err = e
+            if logs is None:
+                raise RuntimeError(f"getLogs failed on all RPCs: {last_err}")
+            for lg in logs or []:
                 topics = lg.get("topics") or []
                 if len(topics) < 3:
                     continue
