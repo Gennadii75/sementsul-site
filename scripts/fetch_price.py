@@ -40,7 +40,29 @@ def main():
 
     holders = None
     api_key = os.environ.get("BSCSCAN_API_KEY")
-    if api_key:
+    moralis_key = os.environ.get("MORALIS_API_KEY")
+    if moralis_key:
+        # Moralis Token Owners (free-план): пагинация курсором, считаем владельцев.
+        try:
+            import urllib.parse
+            total = 0
+            cursor = ""
+            for _ in range(10):
+                url = f"https://deep-index.moralis.io/api/v2.2/erc20/{CONTRACT}/owners?chain=bsc&order=DESC&limit=100" + (f"&cursor={urllib.parse.quote(cursor)}" if cursor else "")
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (SML price updater)", "X-API-Key": moralis_key})
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    owners = json.loads(r.read().decode())
+                result = owners.get("result") or []
+                total += len(result)
+                cursor = owners.get("cursor") or ""
+                if not cursor or not result:
+                    break
+            else:
+                print("moralis owners: more than 1000 holders, count capped")
+            holders = total or None
+        except Exception as e:
+            print("moralis error:", e)
+    elif api_key:
         # Бесплатный способ: все переводы токена (tokentx входит в free-план),
         # считаем адреса с положительным балансом. tokenholderlist — платный.
         try:
