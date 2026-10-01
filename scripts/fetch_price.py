@@ -15,16 +15,19 @@ def main():
     liquidity_usd = None
     change_24h = None
     try:
-        dex = get(f"https://api.dexscreener.com/latest/dex/tokens/{CONTRACT}")
-        pairs = dex.get("pairs") or []
-        bsc_pairs = [p for p in pairs if p.get("chainId") == "bsc"] or pairs
-        if bsc_pairs:
-            p0 = sorted(bsc_pairs, key=lambda p: float(p.get("liquidity", {}).get("usd") or 0), reverse=True)[0]
-            price_usd = p0.get("priceUsd")
-            price_native = p0.get("priceNative")
-            pair_url = p0.get("url")
-            liquidity_usd = (p0.get("liquidity") or {}).get("usd")
-            change_24h = (p0.get("priceChange") or {}).get("h24")
+        gt = get(f"https://api.geckoterminal.com/api/v2/networks/bsc/tokens/{CONTRACT}/pools?page=1")
+        pools = gt.get("data") or []
+        if pools:
+            a0 = sorted(pools, key=lambda p: float((p.get("attributes") or {}).get("reserve_in_usd") or 0), reverse=True)[0]
+            attr = a0.get("attributes") or {}
+            price_usd = attr.get("base_token_price_usd")
+            liquidity_usd = attr.get("reserve_in_usd")
+            change_24h = (attr.get("price_change_percentage") or {}).get("h24")
+            pool_addr = attr.get("address")
+            if pool_addr:
+                pair_url = f"https://www.geckoterminal.com/bsc/pools/{pool_addr}"
+    except Exception as e:
+        print("geckoterminal error:", e)
     except Exception as e:
         print("dexscreener error:", e)
 
@@ -39,7 +42,7 @@ def main():
     api_key = os.environ.get("BSCSCAN_API_KEY")
     if api_key:
         try:
-            bsc = get(f"https://api.bscscan.com/api?module=token&action=tokenholderlist&contractaddress={CONTRACT}&page=1&offset=10000&apikey={api_key}")
+            bsc = get(f"https://api.etherscan.io/v2/api?chainid=56&module=token&action=tokenholderlist&contractaddress={CONTRACT}&page=1&offset=10000&apikey={api_key}")
             if str(bsc.get("status")) == "1":
                 holders = len(bsc.get("result") or [])
             else:
