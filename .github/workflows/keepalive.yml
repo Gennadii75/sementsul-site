@@ -26,5 +26,6 @@ jobs:
           git add .keepalive
           git commit -m "keepalive ping"
           git pull --rebase origin main || true
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Gennadii75/sementsul-site.git
           git push
 

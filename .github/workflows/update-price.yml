@@ -28,4 +28,5 @@ jobs:
           git config user.email "github-actions@github.com"
           git add data/price.json
           git commit -m "update price"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Gennadii75/sementsul-site.git
           git push
