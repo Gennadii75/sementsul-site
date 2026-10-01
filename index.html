@@ -370,6 +370,37 @@
             color: #666;
         }
 
+        /* ================= ЯЗЫКИ ================= */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lang-switch {
+            display: flex;
+            border: 1px solid var(--gold);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .lang-switch button {
+            background: transparent;
+            border: 0;
+            color: var(--gold);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .lang-switch button.active {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
         /* ================= АДАПТИВ ================= */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
@@ -391,12 +422,19 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="#heritage">Наследие</a></li>
-                    <li><a href="#tokenomics">Токеномика</a></li>
-                    <li><a href="#dashboard">Ликвидность</a></li>
+                    <li><a href="#heritage" data-i18n="nav_heritage">Наследие</a></li>
+                    <li><a href="#tokenomics" data-i18n="nav_tokenomics">Токеномика</a></li>
+                    <li><a href="#dashboard" data-i18n="nav_liquidity">Ликвидность</a></li>
                 </ul>
             </nav>
-            <a class="btn btn-primary" style="padding: 10px 20px; font-size: 0.8rem;" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">BscScan</a>
+            <div class="header-actions">
+                <div class="lang-switch" role="group" aria-label="Language">
+                    <button data-lang="en">EN</button>
+                    <button data-lang="zh">CN</button>
+                    <button data-lang="ru">RU</button>
+                </div>
+                <a class="btn btn-primary" style="padding: 10px 20px; font-size: 0.8rem;" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">BscScan</a>
+            </div>
         </div>
     </header>
 
@@ -404,10 +442,10 @@
     <section class="hero container">
         <img src="sml-256.png" alt="Sementsul Crest" class="hero-logo">
         <h1>SEMENTSUL</h1>
-        <p>Фамильная валюта. Имперская стабильность. Цифровое наследие.</p>
+        <p data-i18n="hero_sub">Фамильная валюта. Имперская стабильность. Цифровое наследие.</p>
         <div class="hero-buttons">
-            <a class="btn btn-primary" href="https://pancakeswap.finance/swap?outputCurrency=0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Купить SML</a>
-            <a class="btn btn-secondary" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Контракт</a>
+            <a class="btn btn-primary" data-i18n="buy" href="https://pancakeswap.finance/swap?outputCurrency=0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Купить SML</a>
+            <a class="btn btn-secondary" data-i18n="contract_btn" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Контракт</a>
         </div>
     </section>
 
@@ -417,23 +455,23 @@
             <!-- Карточка 1: Цена -->
             <div class="stat-card">
                 <div class="stat-icon">⚜️</div>
-                <div class="stat-label">Цена SML</div>
+                <div class="stat-label" data-i18n="price_label">Цена SML</div>
                 <div class="stat-value" id="price">—</div>
                 <div class="stat-sub" id="price-sub">нет ликвидности — цена появится после пула</div>
             </div>
             <!-- Карточка 2: Ликвидность -->
             <div class="stat-card">
                 <div class="stat-icon">🏦</div>
-                <div class="stat-label">Ликвидность</div>
+                <div class="stat-label" data-i18n="liq_label">Ликвидность</div>
                 <div class="stat-value" id="liquidity">—</div>
                 <div class="stat-sub" id="liquidity-sub">DexScreener, BNB Chain</div>
             </div>
             <!-- Карточка 3: Держатели -->
             <div class="stat-card">
                 <div class="stat-icon">👑</div>
-                <div class="stat-label">Держатели</div>
+                <div class="stat-label" data-i18n="holders_label">Держатели</div>
                 <div class="stat-value" id="holders">—</div>
-                <div class="stat-sub">счетчик после BscScan API-ключа</div>
+                <div class="stat-sub" data-i18n="holders_sub">счетчик после BscScan API-ключа</div>
             </div>
         </div>
     </section>
@@ -442,10 +480,10 @@
     <section class="heritage container" id="heritage">
         <div class="heritage-inner">
             <div class="heritage-text">
-                <h2>Имперское Наследие</h2>
-                <p>Sementsul — это не просто токен. Это цифровой символ рода, объединяющий традиции и современные технологии блокчейна.</p>
-                <p>В основе нашего герба лежат пшеница (символ плодородия и роста) и львы (символ силы и защиты). Мы создаем валюту, которая будет передаваться из поколения в поколение.</p>
-                <a class="btn btn-secondary" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Проверить контракт</a>
+                <h2 data-i18n="heritage_h">Имперское Наследие</h2>
+                <p data-i18n="heritage_p1">Sementsul — это не просто токен. Это цифровой символ рода, объединяющий традиции и современные технологии блокчейна.</p>
+                <p data-i18n="heritage_p2">В основе нашего герба лежат пшеница (символ плодородия и роста) и львы (символ силы и защиты). Мы создаем валюту, которая будет передаваться из поколения в поколение.</p>
+                <a class="btn btn-secondary" data-i18n="check_btn" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Проверить контракт</a>
             </div>
             <div class="heritage-image">
                 <img src="sml-256.png" alt="Sementsul Medallion">
@@ -456,22 +494,22 @@
     <!-- ================= ТОКЕНОМИКА ================= -->
     <section class="tokenomics" id="tokenomics">
         <div class="container">
-            <h2>Токеномика</h2>
+            <h2 data-i18n="tok_h">Токеномика</h2>
             <div class="token-grid">
                 <div class="token-item">
-                    <h3>Общее предложение</h3>
+                    <h3 data-i18n="supply">Общее предложение</h3>
                     <div class="value">1,000,000,000</div>
                 </div>
                 <div class="token-item">
-                    <h3>Сеть</h3>
+                    <h3 data-i18n="network">Сеть</h3>
                     <div class="value">BNB Chain</div>
                 </div>
                 <div class="token-item">
-                    <h3>Налог покупки</h3>
+                    <h3 data-i18n="buy_tax">Налог покупки</h3>
                     <div class="value">0%</div>
                 </div>
                 <div class="token-item">
-                    <h3>Налог продажи</h3>
+                    <h3 data-i18n="sell_tax">Налог продажи</h3>
                     <div class="value">0%</div>
                 </div>
             </div>
@@ -496,30 +534,110 @@
         </div>
     </footer>
 
-    <!-- ================= СКРИПТ (реальные данные) ================= -->
+    <!-- ================= СКРИПТ (язык + реальные данные) ================= -->
     <script>
-        // Реальные данные: data/price.json обновляется скриптом scripts/fetch_price.py каждые 5 минут.
+        // ---------- Язык: куки sml_lang, по умолчанию язык браузера, fallback EN ----------
+        var I18N = {
+            en: {
+                nav_heritage: 'Heritage', nav_tokenomics: 'Tokenomics', nav_liquidity: 'Liquidity',
+                hero_sub: 'Family currency. Imperial stability. Digital heritage.',
+                buy: 'Buy SML', contract_btn: 'Contract',
+                price_label: 'SML Price', liq_label: 'Liquidity', holders_label: 'Holders',
+                holders_sub: 'counter after BscScan API key',
+                heritage_h: 'Imperial Heritage',
+                heritage_p1: 'Sementsul is not just a token. It is a digital symbol of the house, uniting tradition and modern blockchain technology.',
+                heritage_p2: 'Our crest is built on wheat (fertility and growth) and lions (strength and protection). We are creating a currency to pass from generation to generation.',
+                check_btn: 'Verify contract',
+                tok_h: 'Tokenomics', supply: 'Total supply', network: 'Network',
+                buy_tax: 'Buy tax', sell_tax: 'Sell tax',
+                no_pool: 'no liquidity — price appears after the pool',
+                per24: '% 24h', dex: 'DexScreener, BNB Chain', view_pool: 'View pool on DexScreener'
+            },
+            ru: {
+                nav_heritage: 'Наследие', nav_tokenomics: 'Токеномика', nav_liquidity: 'Ликвидность',
+                hero_sub: 'Фамильная валюта. Имперская стабильность. Цифровое наследие.',
+                buy: 'Купить SML', contract_btn: 'Контракт',
+                price_label: 'Цена SML', liq_label: 'Ликвидность', holders_label: 'Держатели',
+                holders_sub: 'счетчик после BscScan API-ключа',
+                heritage_h: 'Имперское Наследие',
+                heritage_p1: 'Sementsul — это не просто токен. Это цифровой символ рода, объединяющий традиции и современные технологии блокчейна.',
+                heritage_p2: 'В основе нашего герба лежат пшеница (символ плодородия и роста) и львы (символ силы и защиты). Мы создаем валюту, которая будет передаваться из поколения в поколение.',
+                check_btn: 'Проверить контракт',
+                tok_h: 'Токеномика', supply: 'Общее предложение', network: 'Сеть',
+                buy_tax: 'Налог покупки', sell_tax: 'Налог продажи',
+                no_pool: 'нет ликвидности — цена появится после пула',
+                per24: '% за 24ч', dex: 'DexScreener, BNB Chain', view_pool: 'Смотреть пул на DexScreener'
+            },
+            zh: {
+                nav_heritage: '传承', nav_tokenomics: '代币经济', nav_liquidity: '流动性',
+                hero_sub: '家族货币。帝国稳定。数字传承。',
+                buy: '购买 SML', contract_btn: '合约',
+                price_label: 'SML 价格', liq_label: '流动性', holders_label: '持有者',
+                holders_sub: 'BscScan API 密钥后统计',
+                heritage_h: '帝国传承',
+                heritage_p1: 'Sementsul 不只是一个代币。它是家族的数字象征，融合传统与现代区块链技术。',
+                heritage_p2: '我们的纹章以小麦（丰饶与成长）和雄狮（力量与守护）为核心。我们正在创造代代相传的货币。',
+                check_btn: '验证合约',
+                tok_h: '代币经济', supply: '总供应量', network: '网络',
+                buy_tax: '买入税', sell_tax: '卖出税',
+                no_pool: '暂无流动性——资金池建立后显示价格',
+                per24: '% 24小时', dex: 'DexScreener, BNB Chain', view_pool: '在 DexScreener 查看资金池'
+            }
+        };
+        function getCookie(n) {
+            var m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)'));
+            return m ? decodeURIComponent(m[1]) : null;
+        }
+        function setCookie(n, v) {
+            document.cookie = n + '=' + encodeURIComponent(v) + '; max-age=31536000; path=/; SameSite=Lax';
+        }
+        var LANG = getCookie('sml_lang');
+        if (!LANG || !I18N[LANG]) {
+            var b = (navigator.language || 'en').toLowerCase();
+            LANG = b.indexOf('ru') === 0 ? 'ru' : (b.indexOf('zh') === 0 ? 'zh' : 'en');
+        }
+        function applyLang(l) {
+            LANG = I18N[l] ? l : 'en';
+            setCookie('sml_lang', LANG);
+            document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
+            document.querySelectorAll('[data-i18n]').forEach(function (el) {
+                var k = el.getAttribute('data-i18n');
+                if (I18N[LANG][k] != null) el.textContent = I18N[LANG][k];
+            });
+            document.querySelectorAll('.lang-switch button').forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === LANG);
+            });
+            var ps = document.getElementById('price-sub');
+            if (ps && document.getElementById('price').textContent === '—') ps.textContent = I18N[LANG].no_pool;
+        }
+        document.querySelectorAll('.lang-switch button').forEach(function (btn) {
+            btn.addEventListener('click', function () { applyLang(btn.getAttribute('data-lang')); });
+        });
+        applyLang(LANG);
+
+        // ---------- Реальные данные: data/price.json обновляется каждые 5 минут ----------
         // Пока нет пула на PancakeSwap — DexScreener отдает null, показываем прочерк.
         function fmtUsd(n) {
             if (n == null || isNaN(Number(n))) return '—';
-            const v = Number(n);
+            var v = Number(n);
             if (v >= 1000) return '$' + v.toLocaleString('en-US', {maximumFractionDigits: 0});
             if (v >= 1) return '$' + v.toFixed(2);
             return '$' + v.toPrecision(3);
         }
-        fetch('data/price.json').then(r => r.json()).then(d => {
+        fetch('data/price.json').then(function (r) { return r.json(); }).then(function (d) {
             if (d.priceUsd != null) {
                 document.getElementById('price').textContent = fmtUsd(d.priceUsd);
-                const sub = document.getElementById('price-sub');
-                sub.textContent = (d.change24h != null ? (Number(d.change24h) >= 0 ? '+' : '') + Number(d.change24h).toFixed(2) + '% за 24ч' : 'DexScreener, BNB Chain')
+                var sub = document.getElementById('price-sub');
+                sub.textContent = (d.change24h != null ? (Number(d.change24h) >= 0 ? '+' : '') + Number(d.change24h).toFixed(2) + I18N[LANG].per24 : I18N[LANG].dex)
                     + (d.updatedAt ? ' · ' + new Date(d.updatedAt).toLocaleString() : '');
             }
             if (d.liquidityUsd != null) {
                 document.getElementById('liquidity').textContent = fmtUsd(d.liquidityUsd);
-                document.getElementById('liquidity-sub').textContent = d.pairUrl ? 'Смотреть пул на DexScreener' : 'DexScreener, BNB Chain';
-                if (d.pairUrl) document.getElementById('liquidity-sub').innerHTML = '<a href="' + d.pairUrl + '" target="_blank">Смотреть пул на DexScreener</a>';
+                var ls = document.getElementById('liquidity-sub');
+                if (d.pairUrl) ls.innerHTML = '<a href="' + d.pairUrl + '" target="_blank">' + I18N[LANG].view_pool + '</a>';
+                else ls.textContent = I18N[LANG].dex;
             }
-        }).catch(() => {});
+        }).catch(function () {});
     </script>
 
 </body>
