@@ -426,6 +426,37 @@
             color: var(--navy);
         }
 
+        /* ================= ГЕО-БЛОК ================= */
+        #geo-block {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--navy);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #geo-block.show { display: flex; }
+
+        #geo-block img {
+            width: 120px;
+            border-radius: 50%;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4));
+        }
+
+        #geo-block p {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            max-width: 600px;
+        }
+
         /* ================= АДАПТИВ ================= */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
@@ -437,6 +468,31 @@
     </style>
 </head>
 <body>
+
+    <div id="geo-block" role="alert">
+        <img src="sml-256.png" alt="Sementsul">
+        <p>К сожалению оборот нашей крипто валюты ограничен в вашем регионе.</p>
+    </div>
+    <script>
+        // Гео-блок: RU по IP. При недоступности API — сайт открыт (fail-open).
+        (function () {
+            function show() { document.getElementById('geo-block').classList.add('show'); }
+            function check(url, parse) {
+                var c = new AbortController();
+                var t = setTimeout(function () { c.abort(); }, 8000);
+                return fetch(url, { signal: c.signal }).then(function (r) { return r.json(); }).then(function (d) {
+                    clearTimeout(t);
+                    return parse(d);
+                }).catch(function () { return null; });
+            }
+            check('https://ipapi.co/json/', function (d) { return d && d.country_code; }).then(function (cc) {
+                if (cc) { if (cc === 'RU') show(); return; }
+                return check('https://ip-api.com/json/?fields=countryCode', function (d) { return d && d.countryCode; }).then(function (cc2) {
+                    if (cc2 === 'RU') show();
+                });
+            });
+        })();
+    </script>
 
     <!-- ================= ХЕДЕР ================= -->
     <header>
