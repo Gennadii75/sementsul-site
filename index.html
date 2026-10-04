@@ -513,6 +513,7 @@
                 }).catch(function () { return null; });
             }
             var sources = [
+                ['https://api.sypexgeo.net/json/', function (d) { return d && d.country && d.country.iso; }],
                 ['https://ipwho.is/?fields=country_code', function (d) { return d && d.country_code; }],
                 ['https://freeipapi.com/api/json', function (d) { return d && (d.countryCode || d.country_code); }],
                 ['https://ipapi.co/json/', function (d) { return d && d.country_code; }],
