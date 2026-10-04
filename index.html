@@ -497,22 +497,34 @@
     </div>
     <script>
         // Гео-блок: RU по IP. При недоступности API — сайт открыт (fail-open).
+        // Проверка экрана: открыть сайт с ?geo=RU
         (function () {
             function show() { document.getElementById('geo-block').classList.add('show'); }
-            function check(url, parse) {
+            if (/(?:\?|&)geo=RU(?:&|$)/.test(location.search)) { show(); return; }
+            function check(url, parse, ms) {
                 var c = new AbortController();
-                var t = setTimeout(function () { c.abort(); }, 8000);
-                return fetch(url, { signal: c.signal }).then(function (r) { return r.json(); }).then(function (d) {
-                    clearTimeout(t);
-                    return parse(d);
+                var t = setTimeout(function () { c.abort(); }, ms || 12000);
+                return fetch(url, { signal: c.signal }).then(function (r) {
+                    var ct = r.headers.get('content-type') || '';
+                    return (ct.indexOf('json') !== -1 ? r.json() : r.text()).then(function (d) {
+                        clearTimeout(t);
+                        return parse(d);
+                    });
                 }).catch(function () { return null; });
             }
-            check('https://ipapi.co/json/', function (d) { return d && d.country_code; }).then(function (cc) {
-                if (cc) { if (cc === 'RU') show(); return; }
-                return check('https://ip-api.com/json/?fields=countryCode', function (d) { return d && d.countryCode; }).then(function (cc2) {
-                    if (cc2 === 'RU') show();
+            var sources = [
+                ['https://ipwho.is/?fields=country_code', function (d) { return d && d.country_code; }],
+                ['https://freeipapi.com/api/json', function (d) { return d && (d.countryCode || d.country_code); }],
+                ['https://ipapi.co/json/', function (d) { return d && d.country_code; }],
+                ['https://ip-api.com/json/?fields=countryCode', function (d) { return d && d.countryCode; }]
+            ];
+            (function next(i) {
+                if (i >= sources.length) return;
+                check(sources[i][0], sources[i][1]).then(function (cc) {
+                    if (cc) { if (cc === 'RU') show(); }
+                    else next(i + 1);
                 });
-            });
+            })(0);
         })();
     </script>
 
