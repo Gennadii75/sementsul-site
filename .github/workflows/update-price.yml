@@ -26,7 +26,7 @@ jobs:
           if git diff --quiet; then echo "no changes"; exit 0; fi
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add data/price.json
+          git add data/price.json data/supply.txt data/circulating.txt
           git commit -m "update price"
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Gennadii75/sementsul-site.git
           git push

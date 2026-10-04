@@ -180,6 +180,14 @@ def main():
     with open(OUT, "w") as f:
         json.dump(data, f, indent=2)
     print("wrote", OUT, data)
+    # Плоские эндпоинты для CMC: только число, тем же номиналом, что цена.
+    try:
+        with open("data/supply.txt", "w") as f:
+            f.write(str(data.get("totalSupply", "")))
+        with open("data/circulating.txt", "w") as f:
+            f.write(str(data.get("totalSupply", "")))
+    except Exception as e:
+        print("txt endpoints error:", e)
 
 if __name__ == "__main__":
     main()
