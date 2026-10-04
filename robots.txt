@@ -1,4 +1,4 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 
-Sitemap: https://sementsul.info.gf/sitemap.xml
+Sitemap: https://sementsul.net/sitemap.xml

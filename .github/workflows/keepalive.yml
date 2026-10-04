@@ -16,7 +16,7 @@ jobs:
       - name: Ping site
         run: |
           curl -s -o /dev/null -w "pages: %{http_code}\n" https://Gennadii75.github.io/sementsul-site/ || true
-          curl -s -o /dev/null -w "domain: %{http_code}\n" http://sementsul.info.gf/ || true
+          curl -s -o /dev/null -w "domain: %{http_code}\n" http://sementsul.net/ || true
       - name: Keepalive commit
         run: |
           date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
