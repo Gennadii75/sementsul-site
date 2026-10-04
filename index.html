@@ -459,11 +459,33 @@
 
         /* ================= АДАПТИВ ================= */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .hero-logo { max-width: 250px; }
+            .container { padding: 0 16px; }
+            .hero { padding: 50px 0 40px; }
+            .hero h1 { font-size: 2.2rem; letter-spacing: 1px; overflow-wrap: break-word; }
+            .hero p { font-size: 1rem; }
+            .hero-logo { max-width: 220px; }
+            .hero-buttons .btn { padding: 13px 24px; font-size: 0.85rem; }
             nav ul { display: none; }
-            .header-inner { justify-content: center; }
+            header { padding: 12px 0; }
+            .header-inner { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .logo-small img { height: 40px; }
+            .logo-small span { font-size: 1.2rem; }
+            .header-actions { flex-wrap: wrap; justify-content: center; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .stat-card { padding: 30px 15px; }
+            .stat-value { font-size: 2rem; overflow-wrap: break-word; }
+            .token-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .token-item { padding: 20px 12px; }
+            .token-item .value { font-size: 1.3rem; }
+            .token-item h3 { font-size: 0.95rem; }
             .heritage-inner { flex-direction: column-reverse; text-align: center; }
+            .heritage-text h2, .tokenomics h2 { font-size: 1.7rem; }
+        }
+
+        @media (max-width: 380px) {
+            .hero h1 { font-size: 1.8rem; }
+            .token-grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 1.7rem; }
         }
     </style>
 </head>
