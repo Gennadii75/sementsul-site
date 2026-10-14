@@ -567,6 +567,7 @@
 
     <!-- ================= ДАШБОРД (СТАТИСТИКА) ================= -->
     <section class="dashboard container" id="dashboard">
+        <div id="v2-banner" style="display:none; border:1px solid var(--gold); border-radius:8px; padding:15px 20px; margin-bottom:25px; background:rgba(212,175,55,.08); font-size:.9rem;"></div>
         <div class="dashboard-grid">
             <!-- Карточка 1: Цена -->
             <div class="stat-card">
@@ -588,6 +589,27 @@
                 <div class="stat-label" data-i18n="holders_label">Держатели</div>
                 <div class="stat-value" id="holders">—</div>
                 <div class="stat-sub" data-i18n="holders_sub">BEP-20 · BNB Chain</div>
+            </div>
+            <!-- Карточка 4: Сожжено V2 -->
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-label">Сожжено (V2)</div>
+                <div class="stat-value" id="burned">—</div>
+                <div class="stat-sub" id="burned-sub">totalBurned · BNB Chain</div>
+            </div>
+            <!-- Карточка 5: Резерв V2 -->
+            <div class="stat-card">
+                <div class="stat-icon">🏛</div>
+                <div class="stat-label">Резерв сжигания</div>
+                <div class="stat-value" id="reserve">—</div>
+                <div class="stat-sub">на балансе контракта V2</div>
+            </div>
+            <!-- Карточка 6: Год контракта -->
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-label">Год / лимит года</div>
+                <div class="stat-value" id="ctryear" style="font-size:1.6rem;">—</div>
+                <div class="stat-sub">кап 2.5M SML / год</div>
             </div>
         </div>
     </section>
@@ -646,13 +668,40 @@
             <div class="copyright">
                 © 2026 Sementsul. All rights reserved. <br>
                 <a href="mailto:info@sementsul.net">info@sementsul.net</a> · <a href="https://coinmarketcap.com/" target="_blank" rel="noopener">Market data: CoinMarketCap</a> <br>
-                <span data-i18n="contract_addr">Адрес контракта:</span> 0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3
+                <span data-i18n="contract_addr">Адрес контракта:</span> <span id="contract-addr">0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3</span>
             </div>
         </div>
     </footer>
 
     <!-- ================= СКРИПТ (язык + реальные данные) ================= -->
     <script>
+        // ---------- Контракт: единая точка переключения V1 -> V2 ----------
+        // После деплоя SementsulV2 вписать адрес в CONTRACT_V2 и выставить ACTIVE='V2'.
+        // До этого сайт работает на V1, карточки V2 показывают прочерк.
+        var SML = { V1: '0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3', V2: '0x1FE40AAd7c3c3ccEB4efc9099EFBC57D2Dcc0dC7', ACTIVE: 'V2' };
+        function activeContract() {
+            return (SML.ACTIVE === 'V2' && /^0x[0-9a-fA-F]{40}$/.test(SML.V2)) ? SML.V2 : SML.V1;
+        }
+        function rewriteContractLinks(addr) {
+            document.querySelectorAll('a[href*="bscscan.com/token/0x"], a[href*="outputCurrency=0x"]').forEach(function (a) {
+                a.href = a.href.replace(/0x[0-9a-fA-F]{40}/, addr);
+            });
+            var m = document.querySelector('meta[name="description"]');
+            if (m) m.content = m.content.replace(/0x[0-9a-fA-F]{40}/, addr);
+            var ca = document.getElementById('contract-addr');
+            if (ca) ca.textContent = addr;
+            var banner = document.getElementById('v2-banner');
+            if (banner) {
+                if (addr.toLowerCase() === SML.V1.toLowerCase() && SML.V2) {
+                    banner.style.display = 'block';
+                    banner.textContent = 'Миграция на SML V2: новый контракт ' + SML.V2 + '. Проверьте адрес перед обменом.';
+                } else if (addr.toLowerCase() !== SML.V1.toLowerCase()) {
+                    banner.style.display = 'block';
+                    banner.textContent = 'SML V2 активен: ' + addr + '. Дефляция: сжигание 10 при минте 3/7.';
+                }
+            }
+        }
+        rewriteContractLinks(activeContract());
         // ---------- Язык: куки sml_lang, по умолчанию язык браузера, fallback EN ----------
         var I18N = {
             en: {
@@ -756,6 +805,19 @@
             }
             if (d.holders != null) {
                 document.getElementById('holders').textContent = Number(d.holders).toLocaleString('en-US');
+            }
+            // V2-телеметрия: на V1 ее нет — остается прочерк.
+            function fmtSML(v) {
+                if (v == null) return '—';
+                return Number(v).toLocaleString('en-US', {maximumFractionDigits: 1}) + ' SML';
+            }
+            if (d.totalBurned != null) document.getElementById('burned').textContent = fmtSML(d.totalBurned);
+            if (d.burnReserve != null) document.getElementById('reserve').textContent = fmtSML(d.burnReserve);
+            if (d.contractYear != null) document.getElementById('ctryear').textContent = 'год ' + d.contractYear + ' / 2.5M';
+            // Если price.json уже пишет новый контракт — переключаем ссылки автоматически.
+            if (d.contract && /^0x[0-9a-fA-F]{40}$/.test(d.contract) && d.contract.toLowerCase() !== activeContract().toLowerCase()) {
+                if (d.contract.toLowerCase() !== SML.V1.toLowerCase()) { SML.V2 = d.contract; SML.ACTIVE = 'V2'; }
+                rewriteContractLinks(activeContract());
             }
         }).catch(function () {});
     </script>

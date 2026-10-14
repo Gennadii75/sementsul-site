@@ -1,6 +1,7 @@
 ﻿import json, os, urllib.request, datetime
 
-CONTRACT = "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
+# V2: адрес берется из env SML_CONTRACT (workflow secret), fallback — V1.
+CONTRACT = os.environ.get("SML_CONTRACT") or "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
 OUT = "data/price.json"
 
 def get(url, timeout=20):
@@ -155,6 +156,48 @@ def main():
     except Exception as e:
         print("bsc rpc error:", e)
 
+    # V2-телеметрия (на V1-контракте селекторов нет — вернется 0x/ошибка, пишем null).
+    # Селекторы SementsulV2: totalBurned 0x16125cc9, burnReservePool 0x2da9f9f6, currentYear 0x2eb50c7d.
+    def eth_view(selector):
+        try:
+            payload = json.dumps({
+                "jsonrpc": "2.0", "id": 1, "method": "eth_call",
+                "params": [{"to": CONTRACT, "data": selector}, "latest"]
+            }).encode()
+            req = urllib.request.Request("https://bsc-dataseed.binance.org",
+                                         data=payload, headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                res = json.loads(r.read().decode())
+            raw = res.get("result")
+            if not raw or raw == "0x":
+                return None
+            return str(int(raw, 16) / 10**18)
+        except Exception as e:
+            print(f"v2 view {selector} error:", e)
+            return None
+
+    def eth_uint(selector):
+        try:
+            payload = json.dumps({
+                "jsonrpc": "2.0", "id": 1, "method": "eth_call",
+                "params": [{"to": CONTRACT, "data": selector}, "latest"]
+            }).encode()
+            req = urllib.request.Request("https://bsc-dataseed.binance.org",
+                                         data=payload, headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                res = json.loads(r.read().decode())
+            raw = res.get("result")
+            if not raw or raw == "0x":
+                return None
+            return int(raw, 16)
+        except Exception as e:
+            print(f"v2 uint {selector} error:", e)
+            return None
+
+    total_burned = eth_view("0x16125cc9")
+    burn_reserve = eth_view("0x2da9f9f6")
+    current_year = eth_uint("0x2eb50c7d")
+
     data = {
         "priceUsd": price_usd,
         "priceNative": price_native,
@@ -166,6 +209,9 @@ def main():
         "pairUrl": pair_url,
         "updatedAt": datetime.datetime.utcnow().isoformat() + "Z",
         "contract": CONTRACT,
+        "totalBurned": total_burned,
+        "burnReserve": burn_reserve,
+        "contractYear": current_year,
     }
     # Если свежих данных нет — сохраняем последнее известное число холдеров.
     if data["holders"] is None:

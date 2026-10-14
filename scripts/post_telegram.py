@@ -5,7 +5,9 @@ import urllib.request
 import urllib.parse
 
 PRICE_FILE = "data/price.json"
-CONTRACT = "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
+# Адрес для ссылок берем из price.json (его пишет fetch_price.py из SML_CONTRACT).
+# Fallback — V1, чтобы посты не ломались до деплоя V2.
+V1_CONTRACT = "0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3"
 
 
 def fmt_usd(n):
@@ -38,10 +40,13 @@ def main():
     with open(PRICE_FILE, encoding="utf-8") as f:
         d = json.load(f)
 
+    contract = d.get("contract") or V1_CONTRACT
     price = fmt_usd(d.get("priceUsd"))
     liq = fmt_usd(d.get("liquidityUsd"))
     holders = fmt_int(d.get("holders")) if d.get("holders") is not None else "—"
     supply = fmt_int(d.get("totalSupply"))
+    burned = fmt_int(d.get("totalBurned")) if d.get("totalBurned") is not None else None
+    reserve = fmt_int(d.get("burnReserve")) if d.get("burnReserve") is not None else None
     change = d.get("change24h")
     change_s = ""
     if change is not None:
@@ -56,10 +61,12 @@ def main():
         f"💰 Цена: <b>{price}</b>{change_s}\n"
         f"🏦 Ликвидность: <b>{liq}</b>\n"
         f"👑 Держатели: <b>{holders}</b>\n"
-        f"📦 Эмиссия: <b>{supply}</b>\n\n"
-        f"🌐 <a href=\"https://sementsul.net/\">Сайт</a> | "
-        f"<a href=\"https://pancakeswap.finance/swap?outputCurrency={CONTRACT}\">Купить</a> | "
-        f"<a href=\"https://bscscan.com/token/{CONTRACT}\">BscScan</a>"
+        f"📦 Эмиссия: <b>{supply}</b>\n"
+        + (f"🔥 Сожжено: <b>{burned}</b>\n" if burned is not None else "")
+        + (f"🏛 Резерв сжигания: <b>{reserve}</b>\n" if reserve is not None else "")
+        + f"\n🌐 <a href=\"https://sementsul.net/\">Сайт</a> | "
+        f"<a href=\"https://pancakeswap.finance/swap?outputCurrency={contract}\">Купить</a> | "
+        f"<a href=\"https://bscscan.com/token/{contract}\">BscScan</a>"
     )
 
     payload = urllib.parse.urlencode({

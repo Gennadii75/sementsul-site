@@ -65,7 +65,7 @@
     <p data-i18n="msg">Такая страница не найдена в имперском архиве.</p>
     <div class="row">
         <a class="btn btn-primary" data-i18n="home" href="/">На главную</a>
-        <a class="btn" data-i18n="contract_btn" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Контракт</a>
+        <a class="btn" data-i18n="contract_btn" id="contract-link" href="https://bscscan.com/token/0xF79C02a681b3237C7c49D9a6D16BB97316518Ef3" target="_blank">Контракт</a>
     </div>
     <script>
         var T = {
@@ -100,6 +100,12 @@
             btn.addEventListener('click', function () { apply(btn.getAttribute('data-lang')); });
         });
         apply(L);
+        // Подтягиваем активный контракт из price.json (V2 после миграции).
+        fetch('data/price.json').then(function (r) { return r.json(); }).then(function (d) {
+            if (d && d.contract && /^0x[0-9a-fA-F]{40}$/.test(d.contract)) {
+                document.getElementById('contract-link').href = 'https://bscscan.com/token/' + d.contract;
+            }
+        }).catch(function () {});
     </script>
 </body>
 </html>
