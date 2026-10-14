@@ -157,7 +157,8 @@ def main():
         print("bsc rpc error:", e)
 
     # V2-телеметрия (на V1-контракте селекторов нет — вернется 0x/ошибка, пишем null).
-    # Селекторы SementsulV2: totalBurned 0x16125cc9, burnReservePool 0x2da9f9f6, currentYear 0x2eb50c7d.
+    # Селекторы SementsulV2 (keccak, сверены по 3 эталонам incl. owner()=0x8da5cb5b):
+    # totalBurned 0xd89135cd, burnReservePool 0xf053b2b9, currentYear 0x0b5a006b.
     def eth_view(selector):
         try:
             payload = json.dumps({
@@ -194,9 +195,9 @@ def main():
             print(f"v2 uint {selector} error:", e)
             return None
 
-    total_burned = eth_view("0x16125cc9")
-    burn_reserve = eth_view("0x2da9f9f6")
-    current_year = eth_uint("0x2eb50c7d")
+    total_burned = eth_view("0xd89135cd")
+    burn_reserve = eth_view("0xf053b2b9")
+    current_year = eth_uint("0x0b5a006b")
 
     data = {
         "priceUsd": price_usd,
