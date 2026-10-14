@@ -838,7 +838,7 @@
             // V2-телеметрия: на V1 ее нет — остается прочерк.
             function fmtSML(v) {
                 if (v == null) return '—';
-                return Number(v).toLocaleString('en-US', {maximumFractionDigits: 1}) + ' SML';
+                return Number(v).toLocaleString('en-US', {maximumFractionDigits: 1}) + ' SML';
             }
             if (d.totalBurned != null) document.getElementById('burned').textContent = fmtSML(d.totalBurned);
             if (d.burnReserve != null) document.getElementById('reserve').textContent = fmtSML(d.burnReserve);
