@@ -3,13 +3,13 @@
   "priceNative": null,
   "liquidityUsd": null,
   "change24h": null,
-  "bnbUsd": 738.42,
+  "bnbUsd": 733.34,
   "holders": null,
-  "totalSupply": "1000000000.0",
+  "totalSupply": "999999993.0",
   "pairUrl": null,
-  "updatedAt": "2026-10-14T13:56:41.478754Z",
+  "updatedAt": "2026-10-14T14:21:39.308450Z",
   "contract": "0x1FE40AAd7c3c3ccEB4efc9099EFBC57D2Dcc0dC7",
-  "totalBurned": "0.0",
-  "burnReserve": "250000000.0",
+  "totalBurned": "10.0",
+  "burnReserve": "249999990.0",
   "contractYear": 0
 }
