@@ -1,15 +1,15 @@
 {
   "priceUsd": "0.0000008775747363",
   "priceNative": null,
-  "liquidityUsd": "9989199.33",
+  "liquidityUsd": "9993903.5154",
   "change24h": "-100",
-  "bnbUsd": 723.05,
+  "bnbUsd": 721.91,
   "holders": null,
-  "totalSupply": "999999675.0",
+  "totalSupply": "999999672.0",
   "pairUrl": "https://www.geckoterminal.com/bsc/pools/0x31085807cfa27d6e9fbd8910528db9d9da49214596fcf0af9e1dc9a8b3f6593b",
-  "updatedAt": "2026-10-18T12:07:59.893836Z",
+  "updatedAt": "2026-10-18T12:38:20.244176Z",
   "contract": "0x1FE40AAd7c3c3ccEB4efc9099EFBC57D2Dcc0dC7",
-  "totalBurned": "510.0",
-  "burnReserve": "249999490.0",
+  "totalBurned": "520.0",
+  "burnReserve": "249999480.0",
   "contractYear": 0
 }
